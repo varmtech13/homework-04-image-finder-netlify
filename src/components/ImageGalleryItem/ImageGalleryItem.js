@@ -1,12 +1,16 @@
 import { Component } from 'react';
+import {
+  ImageGalleriesItem,
+  ImageGalleriesItemImage,
+} from './ImageGalleryItem.styled';
 
 export class ImageGalleryItem extends Component {
   render() {
     const { imgURL, alt, largeImage, onToggle } = this.props;
     return (
-      <li onClick={() => onToggle(largeImage, alt)}>
-        <img src={imgURL} alt={alt} />
-      </li>
+      <ImageGalleriesItem onClick={() => onToggle(largeImage, alt)}>
+        <ImageGalleriesItemImage src={imgURL} alt={alt} />
+      </ImageGalleriesItem>
     );
   }
 }

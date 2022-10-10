@@ -8,6 +8,8 @@ import { ScrollUPButton } from './ScrollUPButton/ScrollUPButton';
 import { fetch } from './services/image-api';
 import { Modal } from './Modal/Modal';
 
+import { AppBlock, Loader, ButtonContainer } from './App.styled';
+
 export class App extends Component {
   state = {
     images: [],
@@ -83,32 +85,32 @@ export class App extends Component {
     const shouldRenderLoadMoreButton = images.length > 0 && !isLoading;
 
     return (
-      <div>
+      <AppBlock>
         {showModal && (
           <Modal onClose={this.toggleModal}>
             <img src={url} alt={alt} />
           </Modal>
         )}
 
-        {error && <p>Uups Error! {error.message}</p>}
+        {error && <p>Oops Error! {error.message}</p>}
 
         <Searchbar onSubmit={this.onChangeQuery} />
 
         <ImageGallery images={images} onToggleModal={this.toggleModal} />
 
         {isLoading && (
-          <div>
+          <Loader>
             <TailSpin type="TailSpin" color="#3f51b5" height={80} width={80} />
-          </div>
+          </Loader>
         )}
 
         {shouldRenderLoadMoreButton && (
-          <div>
+          <ButtonContainer>
             <Button loadMore={this.fetchImages} />
             <ScrollUPButton />
-          </div>
+          </ButtonContainer>
         )}
-      </div>
+      </AppBlock>
     );
   }
 }

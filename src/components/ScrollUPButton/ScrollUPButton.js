@@ -1,5 +1,7 @@
 import { Component } from 'react';
 
+import { ButtonUP } from './ScrollUPButton.styled';
+
 // scroll button appears when the page scrolls to 40px
 
 export class ScrollUPButton extends Component {
@@ -28,14 +30,14 @@ export class ScrollUPButton extends Component {
 
   render() {
     return (
-      <button
+      <ButtonUP
         tupe="button"
         onClick={this.topButtonClick}
         id={this.state.id}
         title="Go to top"
       >
         Top ↑
-      </button>
+      </ButtonUP>
     );
   }
 }

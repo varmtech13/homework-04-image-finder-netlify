@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import { ImageGalleryList } from './ImageGallery.styled';
 
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 
@@ -7,7 +8,7 @@ export class ImageGallery extends Component {
   render() {
     const { images, onToggleModal } = this.props;
     return (
-      <ul>
+      <ImageGalleryList>
         {images.map(({ id, tags, webformatURL, largeImageURL }) => {
           return (
             <ImageGalleryItem
@@ -19,7 +20,7 @@ export class ImageGallery extends Component {
             />
           );
         })}
-      </ul>
+      </ImageGalleryList>
     );
   }
 }
