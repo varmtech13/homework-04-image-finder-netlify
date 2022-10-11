@@ -5,7 +5,7 @@ import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
 import { ScrollUPButton } from './ScrollUPButton/ScrollUPButton';
-import { fetch } from './services/image-api';
+import { fetch } from '../services/image-api';
 import { Modal } from './Modal/Modal';
 
 import { AppBlock, Loader, ButtonContainer } from './App.styled';
@@ -21,6 +21,8 @@ export class App extends Component {
     error: null,
   };
 
+  scrollHeight = 0;
+
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
       this.fetchImages();
@@ -32,10 +34,14 @@ export class App extends Component {
     ) {
       setTimeout(() => {
         window.scrollTo({
-          top: document.documentElement.scrollHeight,
+          top: this.scrollHeight,
           behavior: 'smooth',
         });
       }, 500);
+    }
+
+    if (prevState.currentPage !== this.state.currentPage) {
+      this.fetchImages(this.handleClick.currentPage);
     }
   }
 
@@ -52,6 +58,8 @@ export class App extends Component {
     const { currentPage, searchQuery } = this.state;
     const options = { searchQuery, currentPage };
 
+    this.scrollHeight = document.documentElement.scrollHeight;
+
     this.setState({ isLoading: true });
 
     fetch
@@ -59,7 +67,7 @@ export class App extends Component {
       .then(images => {
         this.setState(prevState => ({
           images: [...prevState.images, ...images],
-          currentPage: prevState.currentPage + 1,
+          //currentPage: prevState.currentPage + 1,
         }));
       })
       .catch(error => this.setState({ error }))
@@ -70,6 +78,12 @@ export class App extends Component {
     this.setState(({ showModal }) => ({
       showModal: !showModal,
       selectImage: { url, alt },
+    }));
+  };
+
+  handleClick = currentPage => {
+    this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1,
     }));
   };
 
@@ -106,7 +120,7 @@ export class App extends Component {
 
         {shouldRenderLoadMoreButton && (
           <ButtonContainer>
-            <Button loadMore={this.fetchImages} />
+            <Button loadMore={this.handleClick} />
             <ScrollUPButton />
           </ButtonContainer>
         )}
