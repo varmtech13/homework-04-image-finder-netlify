@@ -1,29 +1,25 @@
-import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ImageGalleryList } from './ImageGallery.styled';
 
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 
-export class ImageGallery extends Component {
-  render() {
-    const { images, onToggleModal } = this.props;
-    return (
-      <ImageGalleryList>
-        {images.map(({ id, tags, webformatURL, largeImageURL }) => {
-          return (
-            <ImageGalleryItem
-              key={id}
-              imgURL={webformatURL}
-              largeImage={largeImageURL}
-              alt={tags}
-              onToggle={onToggleModal}
-            />
-          );
-        })}
-      </ImageGalleryList>
-    );
-  }
-}
+export const ImageGallery = ({ images, onToggleModal }) => {
+  return (
+    <ImageGalleryList>
+      {images.map(({ id, tags, webformatURL, largeImageURL }) => {
+        return (
+          <ImageGalleryItem
+            key={id}
+            imgURL={webformatURL}
+            largeImage={largeImageURL}
+            alt={tags}
+            onToggle={onToggleModal}
+          />
+        );
+      })}
+    </ImageGalleryList>
+  );
+};
 
 ImageGallery.defaultProp = {
   images: [],

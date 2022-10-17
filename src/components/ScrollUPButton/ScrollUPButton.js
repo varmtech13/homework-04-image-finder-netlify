@@ -1,43 +1,31 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ButtonUP } from './ScrollUPButton.styled';
 
 // scroll button appears when the page scrolls to 40px
 
-export class ScrollUPButton extends Component {
-  state = {
-    pagePx: '',
-    id: '',
+export const ScrollUPButton = () => {
+  const [id, setId] = useState('');
+
+  useEffect(() => {
+    window.addEventListener('scroll', showScroll);
+
+    return () => {
+      window.removeEventListener('scroll', showScroll);
+    };
+  });
+
+  const showScroll = () => {
+    document.documentElement.scrollTop > 40 ? setId('myBtn') : setId('');
   };
 
-  componentDidMount() {
-    window.addEventListener('scroll', this.showScroll);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.showScroll);
-  }
-
-  showScroll = () => {
-    document.documentElement.scrollTop > 40
-      ? this.setState({ id: 'myBtn' })
-      : this.setState({ id: '' });
-  };
-
-  topButtonClick = () => {
+  const topButtonClick = () => {
     window.scrollTo(0, 0);
   };
 
-  render() {
-    return (
-      <ButtonUP
-        tupe="button"
-        onClick={this.topButtonClick}
-        id={this.state.id}
-        title="Go to top"
-      >
-        Top ↑
-      </ButtonUP>
-    );
-  }
-}
+  return (
+    <ButtonUP tupe="button" onClick={topButtonClick} id={id} title="Go to top">
+      Top ↑
+    </ButtonUP>
+  );
+};

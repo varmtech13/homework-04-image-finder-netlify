@@ -1,5 +1,5 @@
-import { Component } from 'react';
-
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-use-before-define */
 import { TailSpin } from 'react-loader-spinner';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -9,122 +9,94 @@ import { fetch } from '../services/image-api';
 import { Modal } from './Modal/Modal';
 
 import { AppBlock, Loader, ButtonContainer } from './App.styled';
+import { useState, useEffect } from 'react';
 
-export class App extends Component {
-  state = {
-    images: [],
-    currentPage: 1,
-    searchQuery: '',
-    isLoading: false,
-    showModal: false,
-    selectImage: {},
-    error: null,
-  };
+export const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectImage, setSelectImage] = useState({});
 
-  scrollHeight = 0;
+  let scrollHeight = 0;
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      this.fetchImages();
+  useEffect(() => {
+    if (searchQuery) {
+      fetchImages();
     }
+  }, [searchQuery, currentPage]);
 
-    if (
-      prevState.images !== this.state.images &&
-      this.state.images.length > 20
-    ) {
+  useEffect(() => {
+    if (images && images.length > 20) {
       setTimeout(() => {
         window.scrollTo({
-          top: this.scrollHeight,
+          top: fetchImages.scrollHeight,
           behavior: 'smooth',
         });
       }, 500);
     }
+  }, [images, scrollHeight]);
 
-    if (prevState.currentPage !== this.state.currentPage) {
-      this.fetchImages(this.handleClick.currentPage);
-    }
-  }
-
-  onChangeQuery = query => {
-    this.setState({
-      searchQuery: query,
-      currentPage: 1,
-      images: [],
-      error: null,
-    });
+  const onChangeQuery = query => {
+    setSearchQuery(query);
+    setImages([]);
+    setCurrentPage(1);
+    setError(null);
   };
 
-  fetchImages = () => {
-    const { currentPage, searchQuery } = this.state;
+  const fetchImages = () => {
     const options = { searchQuery, currentPage };
 
-    this.scrollHeight = document.documentElement.scrollHeight;
+    setIsLoading(true);
 
-    this.setState({ isLoading: true });
+    scrollHeight = document.documentElement.scrollHeight;
 
     fetch
       .fetchImages(options)
-      .then(images => {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...images],
-          //currentPage: prevState.currentPage + 1,
-        }));
-      })
-      .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
+      .then(images => setImages(prevState => [...prevState, ...images]))
+      .catch(error => setError({ error }))
+      .finally(() => setIsLoading(false));
   };
 
-  toggleModal = (url, alt) => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-      selectImage: { url, alt },
-    }));
+  const toggleModal = (url, alt) => {
+    setShowModal(showModal => (showModal = !showModal));
+    setSelectImage({ url, alt });
   };
 
-  handleClick = currentPage => {
-    this.setState(prevState => ({
-      currentPage: prevState.currentPage + 1,
-    }));
+  const handleClick = currentPage => {
+    setCurrentPage(currentPage => currentPage + 1);
   };
 
-  render() {
-    const {
-      showModal,
-      images,
-      isLoading,
-      error,
-      selectImage: { url, alt },
-    } = this.state;
+  const shouldRenderLoadMoreButton = images.length > 0 && !isLoading;
 
-    const shouldRenderLoadMoreButton = images.length > 0 && !isLoading;
+  return (
+    <AppBlock>
+      {showModal && (
+        <Modal onClose={toggleModal}>
+          <img src={selectImage.url} alt={selectImage.alt} />
+        </Modal>
+      )}
 
-    return (
-      <AppBlock>
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            <img src={url} alt={alt} />
-          </Modal>
-        )}
+      {error && <p>Oops Error! {error.message}</p>}
 
-        {error && <p>Oops Error! {error.message}</p>}
+      <Searchbar onSubmit={onChangeQuery} />
 
-        <Searchbar onSubmit={this.onChangeQuery} />
+      <ImageGallery images={images} onToggleModal={toggleModal} />
 
-        <ImageGallery images={images} onToggleModal={this.toggleModal} />
+      {isLoading && (
+        <Loader>
+          <TailSpin type="TailSpin" color="#3f51b5" height={80} width={80} />
+        </Loader>
+      )}
 
-        {isLoading && (
-          <Loader>
-            <TailSpin type="TailSpin" color="#3f51b5" height={80} width={80} />
-          </Loader>
-        )}
-
-        {shouldRenderLoadMoreButton && (
-          <ButtonContainer>
-            <Button loadMore={this.handleClick} />
-            <ScrollUPButton />
-          </ButtonContainer>
-        )}
-      </AppBlock>
-    );
-  }
-}
+      {shouldRenderLoadMoreButton && (
+        <ButtonContainer>
+          <Button loadMore={handleClick} />
+          <ScrollUPButton />
+        </ButtonContainer>
+      )}
+    </AppBlock>
+  );
+};
