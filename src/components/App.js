@@ -9,7 +9,7 @@ import { fetch } from '../services/image-api';
 import { Modal } from './Modal/Modal';
 
 import { AppBlock, Loader, ButtonContainer } from './App.styled';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +20,7 @@ export const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectImage, setSelectImage] = useState({});
 
-  let scrollHeight = 0;
+  const scrollHeightRef = useRef(0);
 
   useEffect(() => {
     if (searchQuery) {
@@ -32,12 +32,12 @@ export const App = () => {
     if (images && images.length > 20) {
       setTimeout(() => {
         window.scrollTo({
-          top: fetchImages.scrollHeight,
+          top: scrollHeightRef.current,
           behavior: 'smooth',
         });
       }, 500);
     }
-  }, [images, scrollHeight]);
+  }, [images, scrollHeightRef]);
 
   const onChangeQuery = query => {
     setSearchQuery(query);
@@ -51,7 +51,7 @@ export const App = () => {
 
     setIsLoading(true);
 
-    scrollHeight = document.documentElement.scrollHeight;
+    scrollHeightRef.current = document.documentElement.scrollHeight;
 
     fetch
       .fetchImages(options)
